@@ -1,12 +1,12 @@
 <?php
 if (array_key_exists('tekst',$_REQUEST)) {
     $tekst = $_REQUEST['tekst'];
-    $button = preg_replace('/[a-z]/', '', $tekst);
-    $tekst = preg_replace('/[0-9]/', '', $tekst);
+    $field = preg_replace('/[0-9]/', '', $tekst);
+    $button = preg_replace('/[^0-9]/', '', $tekst);
 }
 else{
     $button="zend";
-    $tekst = "";
+    $field = "";
 }
 ?>
 <html>
@@ -16,7 +16,8 @@ else{
 <body bgcolor="#FFFFFF">
 <form method="post" >
     <p>
-        <input type="text" size="20" name="tekst" value="<?php echo $tekst; ?>"><br>
+        <div>Vul een combinatie van letters en cijfers in:</div>
+        <input type="text" size="20" name="tekst" value="<?php echo $field; ?>"><br>
         <input type="submit" name="start" value=<?php echo $button ?>>
     </p>
 </form>
