@@ -30,7 +30,7 @@ else{
 ?>
 <html>
   <head>
-    <title>Opdracht c</title>
+    <title>Opdracht 3c</title>
   </head>
   <body>
     <?php echo $msg;?>

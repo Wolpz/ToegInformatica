@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>opdracht 2</title>
     <meta http-equiv="refresh" content="30" />
 </head>
 <body>

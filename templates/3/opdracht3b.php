@@ -11,7 +11,7 @@ else{
 ?>
 <html>
 <head>
-    <title>Type conversie</title>
+    <title>opdracht 3b</title>
 </head>
 <body bgcolor="#FFFFFF">
 <form method="post" >
