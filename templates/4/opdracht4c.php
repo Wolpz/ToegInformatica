@@ -79,7 +79,7 @@ else{
         return true;
     }
 
-    function checkSiteValid($site){ // TODO THIS GIVES WRONG RESULT
+    function checkSiteValid($site){
         // URL syntax from: https://www.makeuseof.com/regular-expressions-validate-url/
 
         // Check for protocol

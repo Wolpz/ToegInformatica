@@ -1,33 +1,46 @@
-<?php
-if (array_key_exists('getal',$_REQUEST))
-    $getal=$_REQUEST['getal'];
-else
-    $getal="";
-?>
-
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Opdracht b</title>
+    <title>opdracht 5c</title>
+    <meta http-equiv="refresh" content="30" />
+    <link rel="stylesheet" href="/styles/styles.css">
 </head>
 <body>
+
+<div class="flex-container-row">Het is vandaag:</div>
+<div class="flex-container-row">
 <?php
-
-function converteer($c){
-    settype($c,"integer");
-    settype($c,"string");
-
-    for ($x=0;$x<strlen($c);$x++)
-        echo '<img src="../images/p'.$c[$x].'.gif">';
-}
-
-converteer($getal);
-
+echo toGif(date('d'));
+echo monthToText(date('m'));
+echo toGif(date('Y'));
 ?>
-
-<form  method="post">
-    <input type="text"  name="getal" value="<?php echo $getal ?>">
-    <input type="submit" value="zend">
-</form>
+</div>
+<div class="flex-container-row">
+<?php
+echo 'De tijd is ';
+echo toGif(date('H')).':';
+echo toGif(date('i'));
+?>
+</div>
 
 </body>
 </html>
+
+<?php
+function toGif($c){
+settype($c,"integer");
+settype($c,"string");
+
+for ($x=0;$x<strlen($c);$x++)
+echo '<img src="/images/p'.$c[$x].'.gif">';
+}
+
+function monthToText($month){
+    if($month > 12 || $month < 1)
+        return "Janfebmaartuary (this is an error)";
+
+    $months = array('Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December');
+
+    return $months[$month-1];
+}
+?>
