@@ -8,19 +8,17 @@ if (isset($_REQUEST['adres0']))
 else
     $adres0="";
 
-
-$gev=0;
-$fd=fopen("../../DATA/naam.txt","r");
-while(!feof($fd) && $gev==0){
-    $buffer=trim(fgets($fd,4096));
-    if ($naam0==$buffer){
-        $gev=1;
-        break;
-    }
+$pos = FindInFile($naam0, "../../DATA/namen.txt");
+if($pos != -1){
+    $naamMsg = $naam0.' is gevonden.';
+    $adresMsg = 'Adres: '.getLineFromFile($pos, "../../DATA/adressen.txt");
 }
-fclose($fd);
-
+else{
+    $naamMsg = $naam0.' is niet gevonden.';
+    $adresMsg = '';
+}
 ?>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -31,12 +29,41 @@ fclose($fd);
     <input type=submit value=zend><br>
     <?php
     echo '<input type=text name="naam0" value="'.$naam0.'"><br>';
-    if ($naam0!=""){
-        echo "$naam0 is ";
-        if ($gev!=1) echo "niet ";
-        echo "in het bestand opgenomen";
-    }
     ?>
 </form>
+<div>
+    <?php echo $naamMsg.'<br>'.$adresMsg.'<br>'; ?>
+</div>
 </body>
 </html>
+
+<?php
+// Returns -1 if string (case insensitive) is found in file, or position of string if found (starting at 0)
+    function FindInFile($findString, $filepath){
+        $findString = strtolower($findString);
+        $position = 0;
+
+        $fd=fopen($filepath,"r");
+        while(!feof($fd)){
+            $buffer=strtolower(trim(fgets($fd,4096)));
+            if ($buffer == $findString){       //preg_match('/'.$findString.'/', $buffer)){
+                fclose($fd);
+                return $position;
+            }
+            $position++;
+        }
+        fclose($fd);
+        return -1;
+    }
+
+// Returns a desired line of a file (starting at 0)
+function getLineFromFile($linenum, $filepath){
+    $buffer = '';
+    $fd = fopen($filepath,"r");
+    for($i = 0; ($i <= $linenum || feof($fd)); $i++){
+        $buffer=strtolower(fgets($fd,4096));
+    }
+    fclose($fd);
+    return $buffer;
+}
+?>
