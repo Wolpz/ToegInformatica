@@ -28,11 +28,11 @@ echo toGif(date('i'));
 
 <?php
 function toGif($c){
-settype($c,"integer");
-settype($c,"string");
+    settype($c,"integer");
+    settype($c,"string");
 
-for ($x=0;$x<strlen($c);$x++)
-echo '<img src="/images/p'.$c[$x].'.gif">';
+    for ($x=0;$x<strlen($c);$x++)
+    echo '<img src="/images/p'.$c[$x].'.gif">';
 }
 
 function monthToText($month){

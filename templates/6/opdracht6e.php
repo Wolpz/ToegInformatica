@@ -5,13 +5,13 @@
 </head>
 <body>
 <?php
-    echo 'Visitors: '.logIP_encrypted();
+    echo 'Page visitors: '.toGif(logIP_hash());
 ?>
 </body>
 </html>
 <?php
 // Logs bcrypt hash of visitor's IP address in counter.txt if not already present in file, then returns length of file
- function logIP_encrypted(){
+ function logIP_hash(){
      if (getenv('HTTP_X_FORWARDED_FOR')){
          $ip=getenv('HTTP_X_FORWARDED_FOR');
      }
@@ -25,15 +25,28 @@
      $found = false;
      $fileLength = 0;
      while(!feof($fd)){
-         $fileLength++;
-         if(trim(fgets($fd,4096)) == $ip)
+         $buf = trim(fgets($fd,4096));
+         if($buf != '')
+            $fileLength++;
+         if($buf == $ip)
              $found = true;
      }
      if(!$found){
-         fwrite($fd, $ip, 4096);
+         $fileLength++;
+         fwrite($fd, $ip."\n", 4096);
      }
      fclose($fd);
 
      return $fileLength;
  }
+
+function toGif($c){
+    settype($c,"integer");
+    settype($c,"string");
+    $gifHTML = '';
+
+    for ($x=0;$x<strlen($c);$x++)
+        $gifHTML .= '<img src="/images/p'.$c[$x].'.gif">';
+    return $gifHTML;
+}
 ?>
