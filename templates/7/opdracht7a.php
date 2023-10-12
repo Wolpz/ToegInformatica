@@ -21,16 +21,38 @@ Voer uw gegevens in:<br>
     <input type="submit" value="Nieuw" name="nw">
 </form>
 
+<?php
+ if( ($user == "") || ($password == "") ){
+     // If password or user empty
+     echo 'Vul alstublieft een username en wachtwoord in.<br>';
+ }
+ else if()
+
+ else
+
+?>
+
 </body>
 </html>
 
 <?php
-
+// Appends databases with new user and hashed+salted password. Returns 1 if successful and 0 if not.
 function addNewUser($user, $pw, $db){
-
+    return appendFile($user, 'o7usernames.txt') &&
+        appendFile(crypt($pw, $user), 'o7passwords.txt');
 }
 
-// Returns -1 if string (case insensitive) is found in file, or position of string if found (starting at 0)
+// Appends at end of file in DATA directory if it exists. Returns 1 if successful, 0 if file does not exist.
+function appendFile($string, $file){
+    if(!file_exists('../DATA/'.$file))
+        return 0;
+
+    $feed = fopen('../DATA/'.$file, 'a');
+    fwrite($feed, $string.'\n');
+    return 1;
+}
+
+// Returns -1 if string is not found in file, or position of string if found (starting at 0)
 function FindInFile($findString, $filepath, $IGNORECASE = false){
     if($IGNORECASE)
         $findString = strtolower($findString);
