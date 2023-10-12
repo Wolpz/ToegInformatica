@@ -5,8 +5,9 @@
 </head>
 <body>
 <?php
-    echo 'Page visitors: '.toGif(logIP_hash());
+    echo 'Page visitors: '.toGif(logIP_hash()).'<br>';
 ?>
+Don't worry, your IP address is hashed and salted.
 </body>
 </html>
 <?php

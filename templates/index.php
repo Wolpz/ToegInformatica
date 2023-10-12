@@ -1,19 +1,41 @@
+<?php
+if (isset($_REQUEST['keuze']))
+    $keuze=$_REQUEST['keuze'];
+else
+    $keuze=0;
+?>
+
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Toegepaste Informatica</title>
+  <title>Toegepaste Informatica Index</title>
 </head>
 <body>
-<h2>Kies een opdracht:</h2>
-<a href="1/opdracht1.php">Opdracht 1</a><br>
-<a href="2/opdracht2.php">Opdracht 2</a><br>
-<a href="3/opdracht3b.php">Opdracht 3b</a><br>
-<a href="3/opdracht3c.php">Opdracht 3c</a><br>
-<a href="4/opdracht4a.php">Opdracht 4a</a><br>
-<a href="4/opdracht4b.php">Opdracht 4b</a><br>
-<a href="4/opdracht4c.php">Opdracht 4c</a><br>
-<a href="5/opdracht5c.php">Opdracht 5c</a><br>
-<a href="6/opdracht6d.php">Opdracht 6d</a><br>
-<a href="6/opdracht6e.php">Opdracht 6e</a><br>
+<h1>Opdrachten</h1>
+Dit was even werk om te automatiseren met php maar veel leuker dan individueel linkjes gaan knippen en plakken :) <br>
+<?php
+    $dir = '../templates/';
+    listdir($dir);
+?>
 </body>
 </html>
+
+<?php
+ function listdir($dir){
+     $dirlist = scandir($dir);
+
+     if(sizeof($dirlist) <= 0){
+         echo 'Empty directory.<br>';
+     }
+     else{
+         for($i = 0; $i < sizeof($dirlist); $i++){
+             if( preg_match('/\.php$/', $dirlist[$i]) )
+                 echo '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$dir.$dirlist[$i].'">'.preg_replace('/\.php/', '' , $dirlist[$i]).'</a><br>';
+             else if(!preg_match('/\./', $dirlist[$i])){
+                 echo $dirlist[$i].':<br>';
+                 listdir($dir.$dirlist[$i].'/');
+             }
+         }
+     }
+}
+?>
