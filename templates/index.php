@@ -29,7 +29,7 @@ Dit was even werk om te automatiseren met php maar veel leuker dan individueel l
      }
      else{
          for($i = 0; $i < sizeof($dirlist); $i++){
-             if( preg_match('/\.php$/', $dirlist[$i]) )
+             if( preg_match('/^opdracht.*\.php$/', $dirlist[$i]) )
                  echo '&nbsp;&nbsp;&nbsp;&nbsp;<a href="'.$dir.$dirlist[$i].'">'.preg_replace('/\.php/', '' , $dirlist[$i]).'</a><br>';
              else if(!preg_match('/\./', $dirlist[$i])){
                  echo $dirlist[$i].':<br>';
