@@ -9,7 +9,6 @@ let mode = "pixel";
 let height = 16;
 let width = 16;
 const artBuf = Array(width*height).fill(defaultColour);
-// TODO revamp everything so that it requires implicit setting of array to update
 
 // Create event listeners
 addEventListener('DOMContentLoaded', function(){
@@ -29,7 +28,7 @@ function painting_clear(){
     artBuf.fill(defaultColour);
     painting_update();
 }
-// Update full painting TODO TEST
+// Update full painting
 function painting_update(){
     for(let id = 0; id < (width*height); id++){
         updatePixel(id);
@@ -44,6 +43,11 @@ function updateBuffer(id, colour){
 function updatePixel(id) {
     document.getElementById(id).style.backgroundColor = artBuf[id];
 }
+// Paint a pixel: MAIN PAINTING FUNCTION
+function paintPixel(id, colour){
+    updateBuffer(id, colour);
+    updatePixel(id);
+}
 // Updates currently selected colour value
 function updateCurrColour() {
     currPaint = colourPicker.value;
@@ -53,8 +57,7 @@ function updateCurrColour() {
 function paint(id) {
     switch(mode){
         case "pixel":
-            updateBuffer(id, currPaint);
-            updatePixel(id);
+            paintPixel(id, currPaint);
             break;
         case "bucket":
             paintBucket(id, currPaint);
@@ -78,11 +81,10 @@ function paintBucket(id, newColour) {
 function queueFill(id, OldColour){
 
 }
-// Recursive filling algorithm in + pattern TODO fix
+// Recursive filling algorithm in + pattern
 function recursiveFill(id, oldColour, newColour){
     if(artBuf[id] === oldColour){
-        updateBuffer(id, newColour);
-        updatePixel(id);
+        paintPixel(id, newColour);
         let id_int = parseInt(id);
         let w = id_int%width;
         let h = Math.floor(id_int/ width );

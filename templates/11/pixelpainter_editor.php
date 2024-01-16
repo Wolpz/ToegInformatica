@@ -1,8 +1,8 @@
 <!--
 TODO
 Use table as raster instead of spacer
-clear option
-save option
+clear button
+save option + button
 -->
 
 <!DOCTYPE html>
