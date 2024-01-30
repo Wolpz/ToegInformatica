@@ -1,0 +1,4 @@
+https://xem.github.io/articles/webgl-guide.html#2c
+https://dev.to/valeriavg/pixel-art-editor-using-webgl-3eih
+https://github.com/ValeriaVG/pixel-vg
+https://www.w3schools.com/html/html5_canvas.asp
