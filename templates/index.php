@@ -12,7 +12,7 @@ else
 </head>
 <body>
 <h1>Opdrachten</h1>
-Dit was even werk om te automatiseren met php maar veel leuker dan individueel linkjes gaan knippen en plakken :) <br>
+Veel leuker dan individueel linkjes gaan knippen en plakken :) <br>
 <?php
     $dir = '../templates/';
     listdir($dir);
