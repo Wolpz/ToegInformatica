@@ -119,7 +119,7 @@ function sql_parseData($data){
     }
     $sql['fields'] = implode(",", $fields);
     $sql['values'] = implode(",", $vals);
-    return $sql;
+    return $sql; //wowie
 }
 
 function sql_formatForField($fieldType, $fieldValue){
