@@ -19,7 +19,7 @@ save option + button
             $defaultMode = "pixel";echo 'let mode ='.$defaultMode;
         ?>
     </script>
-    <link rel="stylesheet" href="../../styles/pp_styles.css">
+    <link rel="stylesheet" href="../../styles/painter_styles.css">
 </head>
 
 <body>

@@ -1,0 +1,15 @@
+table {
+    width: 600px;
+    height: 600px;
+    background-color: lightgray;
+}
+
+html, head, body {
+    margin: 0;
+    padding: 25px;
+    background-color: #2a2a2a;
+}
+
+canvas {
+    background-color: salmon;
+}

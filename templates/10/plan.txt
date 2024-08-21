@@ -1,0 +1,10 @@
+table to list entries in db table   DONE
+
+get items from db
+
+add entry
+remove entry
+update entries
+search db
+    unset search params when empty
+
