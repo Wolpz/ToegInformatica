@@ -85,13 +85,18 @@ else
 
 
 
-array_diff();
-
 function getTableColumns($host, $tablename){
     $sql_stmt =
         'SELECT COLUMN_NAME * 
         FROM INFORMATION_SCHEMA.COLUMNS
         WHERE TABLE_NAME='.$tablename;
+
+    $rs = $db->query('SELECT * FROM my_table LIMIT 0');
+    for ($i = 0; $i < $rs->columnCount(); $i++) {
+        $col = $rs->getColumnMeta($i);
+        $columns[] = $col['name'];
+    }
+    print_r($columns);
 
     return executeSQL($host, $sql_stmt);
 }
