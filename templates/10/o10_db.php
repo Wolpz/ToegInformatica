@@ -6,46 +6,32 @@
 - Sorteren
 - Selecties uitvoeren
 
-could directly send sql commands from client but that seems horribly insecure
+json payload map:
+*/
+require_once __DIR__.'/../../src/customDatabase.php';
 
-json:
-IN:
-{
-operation: LIST | ADD | REMOVE | EDIT | SEARCH
-payload: different obj based on operation:
-    LIST:
-        $fields
-        $sort {
-            field
-            order: DESC | ASC
-        }
-    ADD:
-        fields
-        vals
-    REMOVE:
-        id
-    EDIT:
-        id
-        field
-        val
-    SEARCH:
-        $fields
-        $sort {
-            field
-            order: DESC | ASC
-        }
+$db_loc = __DIR__.'/../../databases/toeg_inf_db.db';
+$dbname = 'toeg_inf_db';
+var_dump($db_loc);
+var_dump(file_exists($db_loc));
+
+$db = new customDatabase('sqlite:'.$db_loc, 'imdb_top1000', '', '');
+$display = [
+    'id' => '',
+    'Released_Year' => '2000',
+    'Series_Title' => ''
+];
+$sort = ['direction' => 'ASC', 'column' => 'id'];
+$tablename = 'imdb_top1000';
+
+try{
+    print_r($db->select($tablename, $display, $sort, 10));
+}
+catch(Exception $e){
+    echo $e->getMessage();
 }
 
-OUT:
-response: OK | Error
-data
-*/
-// Database settings
-
-// TODO COMMENT ALL THIS AND JUST RETURN JSON REQUEST FOR NOW
-// TODO REDO ALL THIS TO FIT NEW WAY OF DOING THINGS?
-// TODO CREATE HELPER FUNCTIONS PER OPERATION?
-
+/*
 $payload_maps = array(
     "LIST" => array(
         "fields" => 0,
@@ -103,9 +89,6 @@ function getTableColumns($host, $tablename){
 
 function executeSQL($host, $sql_stmt){
     try {
-        /**
-         * @var PDO
-         */
         $conn = new PDO($host);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -255,3 +238,4 @@ switch($op){
 ////}
 ////echo $rt;
 
+*/
