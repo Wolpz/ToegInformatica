@@ -8,7 +8,7 @@
 
 json payload map:
 */
-require_once __DIR__.'/../../src/customDatabase.php';
+#require_once __DIR__.'/../../src/customDatabase.php';
 
 $db_loc = __DIR__.'/../../databases/toeg_inf_db.db';
 $dbname = 'toeg_inf_db';
@@ -24,38 +24,6 @@ $display = [
 $sort = ['direction' => 'ASC', 'column' => 'id'];
 $tablename = 'imdb_top1000';
 
-try{
-    print_r($db->select($tablename, $display, $sort, 10));
-}
-catch(Exception $e){
-    echo $e->getMessage();
-}
-
-/*
-$payload_maps = array(
-    "LIST" => array(
-        "fields" => 0,
-        "search" => array(
-            // Search conditions go here, AND them in statement for each key
-        ),
-        "sort" => array(
-            "field" => 0,
-            "order" => 0
-        )
-    ),
-    "ADD" => array( // TODO THIS NEEDS TO MATCH (REQ) DATABASE COLUMNS, but not ID
-
-    ),
-    "REMOVE" => array(
-        "id" => 0
-    ),
-    "EDIT" => array(
-        "id" => 0,
-        "field" => 0,
-        "val" => 0
-    )
-);
-
 $serverhost = "sqlite:C:/Users/Laurens/o10db.db";
 $dbname = "o10db.db";
 $tablename = "cats";
@@ -70,7 +38,7 @@ else
     JSON_reportError("No payload.");
 
 
-
+/*
 function getTableColumns($host, $tablename){
     $sql_stmt =
         'SELECT COLUMN_NAME * 

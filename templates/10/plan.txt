@@ -1,10 +1,23 @@
 table to list entries in db table   DONE
 
-get items from db
+backend select, insert, edit, delete operations DONE
 
-add entry
-remove entry
-update entries
-search db
+Serverside:
+(all with return success/fail message)
+Select
+Search
+Insert
+Update
+Delete
+
+Clientside:
+list entries
+search
+    fancy css for magnifying glass icon on search bar
+    sort asc/desc button
     unset search params when empty
+add entry
+update
+remove entry
+
 

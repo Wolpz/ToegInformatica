@@ -4,5 +4,41 @@
 }
 
 .numberGif{
-    position: flex;
+    display: flex;
+}
+
+table.o10table {
+    width:80%;
+    border-collapse: collapse;
+}
+table.o10table th,td {
+    padding: 10px;
+    text-align: left;
+    border: 1px solid;
+}
+
+.sortButton {
+    appearance: none;
+    width: 5%;
+    height: 18px;
+    cursor: pointer;
+    position: relative;
+}
+.sortButton.sort-none::after {
+    content: "↕";
+    position: absolute;
+    font-size: 20px;
+    left: 30%;
+}
+.sortButton.sort-asc::after {
+    content: "↑";
+    position: absolute;
+    font-size: 20px;
+    left: 30%;
+}
+.sortButton.sort-desc::after {
+    content: "↓";
+    position: absolute;
+    font-size: 20px;
+    left: 30%;
 }
