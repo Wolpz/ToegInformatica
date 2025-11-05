@@ -1,4 +1,6 @@
 class CustomTable {
+    // TODO create rebindable table field generation functions to support images and other code
+    // TODO set required fields as such in html and table metadata
     constructor(
         tableElement,
         columnNames,
@@ -18,6 +20,10 @@ class CustomTable {
         this.genDeleteButtons = genDeleteButtons;
 
         this.searchContents = {}; // To query in change handler
+        this.sort = {
+            "column": "id",
+            "direction": "ASC"
+        }
         this.sortButtons = []; // To later reset all to indeterminate
 
         this.header = null;
@@ -182,22 +188,74 @@ class CustomTable {
     /*
         RE-BINDABLES
     */
-    _searchHandler(search_json) {
-        console.log("Search handler unimplemented. Args: "+JSON.stringify(search_json));
+    _searchHandler(search_json, sort_json) {
+        alert("Search handler not bound. See the heading RE-BINDING FUNCTIONS in this class on how to do this.\nArgs:\n"+JSON.stringify(search_json)+"\n"+JSON.stringify(sort_json));
         return this.tableData
     }
-    _sortHandler(sort_json) {
-        console.log(`Sort handler unimplemented. Args: ${JSON.stringify(sort_json)}`);
-        return this.tableData;
-    }
     _updateHandler(update_json) {
-        console.log("Update handler unimplemented. Args: "+JSON.stringify(update_json));
-        return this.tableData;
+        alert("Update handler not bound. See the heading RE-BINDING FUNCTIONS in this class on how to do this.\nArgs: "+JSON.stringify(update_json));
+    }
+    _insertHandler(insert_json) {
+        alert("Insert entry handler not bound. See the heading RE-BINDING FUNCTIONS in this class on how to do this.\nArgs: "+JSON.stringify(update_json));
     }
     _deleteHandler(delete_json) {
-        console.log("Delete handler unimplemented. Args: "+JSON.stringify(delete_json));
-        return this.tableData;
+        alert("Delete handler not bound. See the heading RE-BINDING FUNCTIONS in this class on how to do this.\nArgs: "+JSON.stringify(delete_json));
     }
+
+    /*
+        RE-BINDING FUNCTIONS
+        Passing a function pointer to these functions binds the function to be used to update the table.
+        The function pointed to MUST do the following:
+        - Accept as input: one or more JSON objects in the format specified at the relevant binder function.
+        - Respect the 'this' context as the CustomTable class context, as this will also be rebound.
+            This will let you use 'this' to refer to internal class variables and functions such as TableData if needed.
+    */
+    bind_searchHandler(func_ptr) {
+        /*
+            SearchHandler input format:
+                search_json: dictionary with table column name as key and search field contents as value.
+                    Only non-empty search fields will be present.
+                sort_json: JSON object with fields:
+                {
+                    "direction":"ASC or "DESC" (Ascending, descending),
+                    "column": column name
+                }
+            The rebound SearchHandler must return:
+                A JSON object in the same format as this.tableData, with at least the same column headers as keys.
+
+         */
+        this._searchHandler = func_ptr.bind(this);
+    }
+
+    bind_insertHandler(func_ptr) {
+        /*
+            Insert entry handler input format:
+            insert_json: JSON object with the data to insert into the table, keyed by column name.
+        */
+        this._insertHandler = func_ptr.bind(this);
+    }
+
+    bind_updateHandler(func_ptr) {
+        /*
+            Update entry handler input format:
+                update_json: key-value pairs of the row when CONFIRM button is clicked. Also includes entry id.
+                Ex.
+                {
+                    "name":"Luke",
+                    "age":"5",
+                    "id":"0"
+                }
+         */
+        this._updateHandler = func_ptr.bind(this);
+    }
+    bind_deleteHandler(func_ptr) {
+        /*
+            Delete entry handler input format:
+                delete_json: JSON object that only includes the id of the entry to be deleted.
+         */
+        this._deleteHandler = func_ptr.bind(this);
+    }
+
     /*
         HANDLERS
     */
@@ -208,12 +266,11 @@ class CustomTable {
             this.searchContents[column] = search;
         else
             delete this.searchContents[column];
-        this.tableData = this._searchHandler(this.searchContents);
+        this.tableData = this._searchHandler(this.searchContents, this.sort);
         this.populateBody(this.tableData);
     }
 
     _sortButtonHandler(event) {
-        // TODO update other checkboxes to greyed out state on click. Use input.indeterminate method to set all other sort checkboxes to inactive and greyed out
         const currentButton = event.currentTarget
         const column = currentButton.dataset.col;
         let state;
@@ -233,14 +290,19 @@ class CustomTable {
         currentButton.classList.add(`sort-${state.toLowerCase()}`);
         currentButton.indeterminate = false;
         currentButton.checked = (state === "ASC");
-        const sort = {"direction": state, "column": column};
-        this.tableData = this._sortHandler(sort);
+        this.sort = {"direction": state, "column": column};
+        this.tableData = this._searchHandler(this.searchContents, this.sort);
         this.populateBody(this.tableData);
     }
+
+    // TODO write this
     _addEntryButtonHandler(event) {
         // TODO make this a separate form
+        // TODO check required fields
+        // TODO write a generator for this form
         console.log("add entry button unimplemented")
     }
+
     _updateButtonHandler(event) {
         const button = event.currentTarget
         const rowIndex = button.dataset.rowIndex
@@ -252,7 +314,7 @@ class CustomTable {
             this._setRowFormatting(currentRow, 'edit');
         }
         else if (button.value === "CONFIRM") {
-            // TODO get data from table row
+            // TODO test getting data from table row
             const update = {}
             const inputs = currentRow.querySelectorAll("input[data-column]");
             inputs.forEach(input => {
@@ -260,9 +322,11 @@ class CustomTable {
                 update[col] = input.value;
             })
             update["id"] = button.dataset.id;
+            console.log(update)
             this._setRowFormatting(this.prevEditRow, 'normal');
             this.prevEditRow = null;
-            this.tableData = this._updateHandler(update);
+            this._updateHandler(update);
+            this.tableData = this._searchHandler(this.searchContents, this.sort);
             this.populateBody(this.tableData);
         }
         else {
@@ -292,7 +356,8 @@ class CustomTable {
             button.value = "DELETE";
             button.classList.remove("confirmButton");
             // TODO do server delete stuff
-            this.tableData = this._deleteHandler({"id": id});
+            this._deleteHandler({"id": id});
+            this.tableData = this._searchHandler(this.searchContents, this.sort);
             this.populateBody(this.tableData);
         }
         else {
@@ -332,42 +397,4 @@ class CustomTable {
             console.error(`Error updating row ${rowIndex}: ${e}`)
         }
     }
-}
-
-function updateTable(tableElement, sortParams, searchParams) {
-    // You can turn this into OOP stuff later to couple site tables and db tables!
-
-    let dataParams = {
-        select: {
-            table: "cats",
-            fields: "*",
-            sort: sortParams,
-            search: searchParams
-        }
-    };
-    if (searchParams == null)
-        delete dataParams.select.search;
-
-    $.ajax({
-        url: "db_functions.php",
-        type: "POST",
-        dataType: 'json',
-        encode: true,
-        data: dataParams,
-
-        success: function (json) {
-            if (json)
-                console.log(json);
-
-            if (json.success == false) {
-                $(tableElement).html("An error occurred: \n" + json.errorMsg);
-                $(tableElement).css("background-color", "red");
-            } else {
-                $(tableElement).html(generateTable(json.data));
-            }
-        },
-        error: function (jXHR, textStatus, errorThrown) {
-            alert(errorThrown);
-        }
-    });
 }

@@ -20,6 +20,27 @@ Eisen:
     <link rel="stylesheet" href="../../styles/styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="../../src/dbHelpers.js"></script>
+    <script>
+        function send_request(request_json, server_url) {
+            return $.ajax({
+                url: server_url,
+                type: "POST",
+                dataType: 'json',
+                encode: true,
+                data: request_json,
+
+                success: function (json) {
+                    console.log(json);
+                    return json
+                },
+                error: function (jXHR, textStatus, errorThrown) {
+                    console.log(jXHR.responseText);
+                    throw Error(errorThrown);
+                    // TODO throw this in a little error box
+                }
+            });
+        }
+    </script>
 </head>
 
 <body>
@@ -34,6 +55,8 @@ Eisen:
             { "id": 1, "age": "2", "name": "def" },
             { "id": 2, "name": "xyz", "age": 3.2 }
         ];
+
+        const server_url = "o10_db.php"
         const tableElem = document.getElementById('datatable');
         const table = new CustomTable(
             tableElement = tableElem,
@@ -44,9 +67,41 @@ Eisen:
             genAddEntryFields = true,
             genDeleteButtons = true
         );
-        table.tableData = data
+        table.tableData = data // TODO replace this with db ajax request
         table.populateHeader();
         table.populateBody();
+        /*
+            Binding button handlers
+         */
+        table.bind_searchHandler((search_json, sort_json) => {
+            // Create request: only search
+            const request = {"SEARCH": JSON.stringify({
+                    "data": search_json,
+                    "sort": sort_json
+                })
+            }
+            const result = send_request(request, server_url)
+            if (!result) {
+                return this.tableData
+            }
+            else {
+                return result
+            }
+        });
+        table.bind_updateHandler((data_json) => {
+            // Create request
+            const request = {
+                "UPDATE": data_json
+            }
+            const result = send_request(request, server_url)
+        })
+        table.bind_deleteHandler((data_json) => {
+            // Create request: only search
+            const request = {
+                "DELETE": data_json
+            }
+            const result = send_request(request, server_url)
+        })
     </script>
 </body>
 </html>

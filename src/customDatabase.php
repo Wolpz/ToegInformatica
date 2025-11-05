@@ -2,7 +2,7 @@
 // TODO document this with doxygen
 require "php_helpers.php";
 
-class customDatabase
+class CustomDatabase
 {
     private $db_host;
     private $db_name;
@@ -16,11 +16,10 @@ class customDatabase
             $this->pdo_conn = new PDO($host, $username, $password);
             $this->pdo_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->driver = $this->pdo_conn->getAttribute(PDO::ATTR_DRIVER_NAME);
-            echo "DB Created with driver: $this->driver\r\n";
         }
         catch(PDOException $e){
             $this->pdo_conn = null;
-            echo "Connection failed: " . $e->getMessage()."\r\n";
+            throw new Exception("Connection failed: " . $e->getMessage()."\r\n");
         }
     }
 
@@ -103,9 +102,9 @@ class customDatabase
     /* Select
      * Performs select query on fields present in $data, with a WHERE term for each field that isn't empty.
      */
-    function select($tablename, array $data, array $sort = [], int $limit = -1){
+    function select(string $tableName, array $data, array $sort = [], int $limit = -1){
         // Validate sort column and direction
-        $columns = $this->getColumnMeta($tablename);
+        $columns = $this->getColumnMeta($tableName);
         $columnNames = array_keys($columns);
         if(!empty($sort)) {
             if (!in_array($sort['column'], $columnNames)) {
@@ -123,7 +122,7 @@ class customDatabase
         }
 
         // SQL query
-        $sql = "SELECT " . implode(', ', $fields) . " FROM $tablename";
+        $sql = "SELECT " . implode(', ', $fields) . " FROM $tableName";
 
         // Add WHERE clause if there are search criteria
         $search = [];
@@ -273,11 +272,11 @@ if(!debug_backtrace()){
     */
 
     $db_loc = __DIR__ . '/../databases/toeg_inf_db.db';
-    $dbname = 'toeg_inf_db';
+    $db_name = 'toeg_inf_db';
     var_dump($db_loc);
     var_dump(file_exists($db_loc));
 
-    $db = new customDatabase('sqlite:' . $db_loc, 'imdb_top1000', '', '');
+    $db = new CustomDatabase('sqlite:' . $db_loc, $db_name, '', '');
     $display = [
         'id' => '',
         'Released_Year' => '2000',
