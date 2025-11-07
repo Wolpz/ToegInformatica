@@ -4,34 +4,49 @@ class CustomTable {
     constructor(
         tableElement,
         columnNames,
-        genSearchBars = false,
-        genSortButtons = false,
-        genUpdateButtons = false,
-        genAddEntryFields = false,
-        genDeleteButtons = false
+        {
+            fetchData = null,
+            updateHandler = null,
+            insertHandler = null,
+            deleteHandler = null
+        }
     ) {
         this.element = tableElement;
         this.columns = columnNames;
         this.tableData = [];
-        this.genSearchBars = genSearchBars;
-        this.genUpdateButtons = genUpdateButtons;
-        this.genAddEntryFields = genAddEntryFields;
-        this.genSortButtons = genSortButtons;
-        this.genDeleteButtons = genDeleteButtons;
 
-        this.searchContents = {}; // To query in change handler
+        // Determine generation flags based on handler presence
+        this.genSearchBars = typeof fetchData === "function";
+        this.genSortButtons = typeof fetchData === "function";
+        this.genUpdateButtons = typeof updateHandler === "function";
+        this.genAddEntryFields = typeof insertHandler === "function";
+        this.genDeleteButtons = typeof deleteHandler === "function";
+
+        this.searchContents = {"id": ""};
+        this.columns.forEach(column => (this.searchContents[column] = ""));
         this.sort = {
-            "column": "id",
-            "direction": "ASC"
-        }
-        this.sortButtons = []; // To later reset all to indeterminate
+            column: "id",
+            direction: "ASC"
+        };
+        this.sortButtons = [];
 
         this.header = null;
         this.body = null;
         this.rows = [];
 
         this.prevEditRow = null;
+
+        if (fetchData) {
+            this.bind_searchHandler(fetchData);
+            this.fetchData(this.searchContents, this.sort);
+        }
+        if (updateHandler) this.bind_updateHandler(updateHandler);
+        if (insertHandler) this.bind_insertHandler(insertHandler);
+        if (deleteHandler) this.bind_deleteHandler(deleteHandler);
+
+        this.populateHeader()
     }
+
 
     populateHeader() {
         if (this.header == null)
@@ -82,6 +97,7 @@ class CustomTable {
         if (this.body != null)
             this.body.remove()
         this.body = this.element.createTBody();
+
         this.rows = [];
         for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
             const row = this.generateRow(data[rowIndex], rowIndex);
@@ -125,7 +141,7 @@ class CustomTable {
             if (col in data) {
                 value = data[col];
             }
-            if (options['inputFields']) {
+            if (options['inputFields'] && col !== 'id') {
                 const inputField = document.createElement("input");
                 inputField.type = "text";
                 inputField.value = value;
@@ -188,7 +204,7 @@ class CustomTable {
     /*
         RE-BINDABLES
     */
-    _searchHandler(search_json, sort_json) {
+    fetchData(search_json, sort_json) {
         alert("Search handler not bound. See the heading RE-BINDING FUNCTIONS in this class on how to do this.\nArgs:\n"+JSON.stringify(search_json)+"\n"+JSON.stringify(sort_json));
         return this.tableData
     }
@@ -214,7 +230,7 @@ class CustomTable {
         /*
             SearchHandler input format:
                 search_json: dictionary with table column name as key and search field contents as value.
-                    Only non-empty search fields will be present.
+                    All column names will be present.
                 sort_json: JSON object with fields:
                 {
                     "direction":"ASC or "DESC" (Ascending, descending),
@@ -224,7 +240,7 @@ class CustomTable {
                 A JSON object in the same format as this.tableData, with at least the same column headers as keys.
 
          */
-        this._searchHandler = func_ptr.bind(this);
+        this.fetchData = func_ptr.bind(this);
     }
 
     bind_insertHandler(func_ptr) {
@@ -265,9 +281,8 @@ class CustomTable {
         if (search !== "")
             this.searchContents[column] = search;
         else
-            delete this.searchContents[column];
-        this.tableData = this._searchHandler(this.searchContents, this.sort);
-        this.populateBody(this.tableData);
+            this.searchContents[column] = "";
+        this.fetchData(this.searchContents, this.sort);
     }
 
     _sortButtonHandler(event) {
@@ -291,11 +306,9 @@ class CustomTable {
         currentButton.indeterminate = false;
         currentButton.checked = (state === "ASC");
         this.sort = {"direction": state, "column": column};
-        this.tableData = this._searchHandler(this.searchContents, this.sort);
-        this.populateBody(this.tableData);
+        this.fetchData(this.searchContents, this.sort);
     }
 
-    // TODO write this
     _addEntryButtonHandler(event) {
         // TODO make this a separate form
         // TODO check required fields
@@ -314,7 +327,6 @@ class CustomTable {
             this._setRowFormatting(currentRow, 'edit');
         }
         else if (button.value === "CONFIRM") {
-            // TODO test getting data from table row
             const update = {}
             const inputs = currentRow.querySelectorAll("input[data-column]");
             inputs.forEach(input => {
@@ -326,8 +338,6 @@ class CustomTable {
             this._setRowFormatting(this.prevEditRow, 'normal');
             this.prevEditRow = null;
             this._updateHandler(update);
-            this.tableData = this._searchHandler(this.searchContents, this.sort);
-            this.populateBody(this.tableData);
         }
         else {
             if (this.prevEditRow) {
@@ -355,10 +365,7 @@ class CustomTable {
         else if (button.value === "CONFIRM") {
             button.value = "DELETE";
             button.classList.remove("confirmButton");
-            // TODO do server delete stuff
             this._deleteHandler({"id": id});
-            this.tableData = this._searchHandler(this.searchContents, this.sort);
-            this.populateBody(this.tableData);
         }
         else {
             button.value = "DELETE";

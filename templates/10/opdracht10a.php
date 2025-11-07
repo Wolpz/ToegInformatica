@@ -21,22 +21,32 @@ Eisen:
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="../../src/dbHelpers.js"></script>
     <script>
-        function send_request(request_json, server_url) {
-            return $.ajax({
+        function send_request(request_json, server_url, onSuccess, onError) {
+            console.log("Request sent:", request_json);
+            $.ajax({
                 url: server_url,
                 type: "POST",
                 dataType: 'json',
                 encode: true,
                 data: request_json,
 
-                success: function (json) {
-                    console.log(json);
-                    return json
+                success: function(response) {
+                    console.log("Response:", response);
+                    document.getElementById("table_error_box").innerHTML=""
+                    if (onSuccess)
+                        onSuccess(response)
                 },
-                error: function (jXHR, textStatus, errorThrown) {
-                    console.log(jXHR.responseText);
-                    throw Error(errorThrown);
-                    // TODO throw this in a little error box
+                error: function(xhr, textStatus, errorThrown) {
+                    console.error("AJAX Request Error: ", xhr)
+                    let message = "Unknown error.";
+                    try {
+                        const errObj = JSON.parse(xhr.responseText.slice(3));
+                        message = errObj.message || xhr.responseText;
+                    } catch (_) {
+                        message = xhr.responseText
+                    }
+                    console.error("Server error: ", message)
+                    document.getElementById("table_error_box").innerHTML=message
                 }
             });
         }
@@ -45,63 +55,71 @@ Eisen:
 
 <body>
     <div id="datatable_container">
+        <div id="table_error_box"></div>
         <table id="datatable" class="o10table">
         </table>
     </div>
 
     <script>
-        const data = [
-            { "id": 0, "name": "abc", "age": 1 },
-            { "id": 1, "age": "2", "name": "def" },
-            { "id": 2, "name": "xyz", "age": 3.2 }
-        ];
-
         const server_url = "o10_db.php"
         const tableElem = document.getElementById('datatable');
         const table = new CustomTable(
-            tableElement = tableElem,
-            columnNames = ["name", "age"],
-            genSearchBars = true,
-            genSortButtons = true,
-            genUpdateButtons = true,
-            genAddEntryFields = true,
-            genDeleteButtons = true
-        );
-        table.tableData = data // TODO replace this with db ajax request
-        table.populateHeader();
-        table.populateBody();
-        /*
-            Binding button handlers
-         */
-        table.bind_searchHandler((search_json, sort_json) => {
-            // Create request: only search
-            const request = {"SEARCH": JSON.stringify({
-                    "data": search_json,
-                    "sort": sort_json
-                })
-            }
-            const result = send_request(request, server_url)
-            if (!result) {
-                return this.tableData
-            }
-            else {
-                return result
+            tableElem,
+            ["id", "Series_Title", "Released_Year", "Director"], {
+            fetchData: function (search_json, sort_json) {
+                send_request(
+                    { SEARCH: JSON.stringify({ data: search_json, sort: sort_json }) },
+                    server_url,
+                    function onSuccess(result) {
+                        table.tableData = result.data;
+                        table.populateBody();
+                    },
+                    function onError(xhr, status, err, msg) {
+                        console.error("Search failed:", xhr)
+                    }
+                );
+            },
+            updateHandler: function (data_json) {
+                send_request(
+                    {
+                        UPDATE: data_json,
+                        SEARCH: JSON.stringify(
+                            {
+                                data: table.searchContents,
+                                sort: table.sort
+                            })
+                    },
+                    server_url,
+                    function onSuccess(result) {
+                        table.tableData = result.data;
+                        table.populateBody();
+                    },
+                    function onError(xhr, status, err, msg) {
+                        console.error("Search failed:", xhr)
+                    }
+                );
+            },
+            deleteHandler: function (data_json) {
+                send_request(
+                    {
+                        DELETE: data_json,
+                        SEARCH: JSON.stringify(
+                            {
+                                data: table.searchContents,
+                                sort: table.sort
+                            })
+                    },
+                    server_url,
+                    function onSuccess(result) {
+                        table.tableData = result.data;
+                        table.populateBody();
+                    },
+                    function onError(xhr, status, err, msg) {
+                        console.error("Search failed:", xhr)
+                    }
+                );
             }
         });
-        table.bind_updateHandler((data_json) => {
-            // Create request
-            const request = {
-                "UPDATE": data_json
-            }
-            const result = send_request(request, server_url)
-        })
-        table.bind_deleteHandler((data_json) => {
-            // Create request: only search
-            const request = {
-                "DELETE": data_json
-            }
-            const result = send_request(request, server_url)
-        })
     </script>
 </body>
 </html>

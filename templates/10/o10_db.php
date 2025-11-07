@@ -16,7 +16,6 @@ $tablename = "imdb_top1000";
 
 $imdb_top1000 = new CustomDatabase('sqlite:'.$db_loc, $dbname, '', '');
 
-$reply = ['error' => true];
 if (isset($_POST['DELETE'])) {
     try {
         $data = $_POST['DELETE'];
@@ -29,7 +28,7 @@ if (isset($_POST['DELETE'])) {
 }
 if (isset($_POST['ADD'])) {
     try {
-        // TODO
+        // TODO add insert handling
         $imdb_top1000->insert();
         $reply['error'] = false;
     }
@@ -51,7 +50,12 @@ if (isset($_POST['SEARCH'])) {
     try {
         $request = json_decode($_POST['SEARCH'], true);
         $data = $request['data'];
+        foreach($data as $key => $item) {
+            if ($data[$key] != "")
+            $data[$key] = ['LIKE' => "%".$item."%"];
+        }
         $sort = $request['sort'];
+        $reply['debug'] = $data;
         $reply['data'] = $imdb_top1000->select($tablename, $data, $sort, 10);
         $reply['error'] = false;
     }
@@ -62,7 +66,9 @@ if (isset($_POST['SEARCH'])) {
 echo json_encode($reply);
 
 function return_error($error_msg) {
-    echo http_response_code(400);   // <-- non-2xx code is key
+    echo http_response_code(400);
     echo json_encode(['error' => true, 'message' => $error_msg]);
+    die();
 }
+// Login system: 401 unauthenticated, 403 unauthorized
 ?>

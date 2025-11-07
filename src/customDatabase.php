@@ -30,7 +30,7 @@ class CustomDatabase
 
     function getColumnMeta($tableName){
         $columns = [];
-
+        // TODO add MariaDB driver
         switch($this->driver){
             case "sqlite":
                 $s = $this->pdo_conn->query("PRAGMA table_info('$tableName')");
@@ -127,7 +127,14 @@ class CustomDatabase
         // Add WHERE clause if there are search criteria
         $search = [];
         foreach ($data as $field => $value) {
-            if ($value !== '') {
+            if ($value === '' || $value === null)
+                continue;
+            if(is_array($value)){
+                [$op, $val] = each($value);
+                $search[] = "$field $op :$field";
+                $data[$field] = $val;
+            }
+            else {
                 $search[] = "$field = :$field";
             }
         }
@@ -147,6 +154,7 @@ class CustomDatabase
 
         // Prepare and execute the query
         try {
+            //echo json_encode($sql);
             $stmt = $this->pdo_conn->prepare($sql);
 
             // Bind values
@@ -169,7 +177,6 @@ class CustomDatabase
     /* Insert
     *
     */
-    // TODO TEST
     // TODO Write description
     function insert($tableName, array $data){
         try{
@@ -194,7 +201,6 @@ class CustomDatabase
     /* Edit
     *
     */
-    // TODO TEST
     // TODO Write description
     function edit($tableName, array $data){
         try{
