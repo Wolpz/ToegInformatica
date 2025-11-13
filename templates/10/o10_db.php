@@ -14,8 +14,8 @@ $db_loc = __DIR__.'/../../databases/toeg_inf_db.db';
 $dbname = 'toeg_inf_db';
 $tablename = "imdb_top1000";
 
-$imdb_top1000 = new CustomDatabase('sqlite:'.$db_loc, $dbname, '', '');
-
+//$imdb_top1000 = new CustomDatabase('sqlite:'.$db_loc, $dbname, '', '');
+$imdb_top1000 = new CustomDatabase("localhost:3306" , $dbname, '', '');
 if (isset($_POST['DELETE'])) {
     try {
         $data = $_POST['DELETE'];
