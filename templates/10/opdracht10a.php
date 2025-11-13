@@ -8,11 +8,11 @@ https://www.jetbrains.com/help/phpstorm/import-data.html#import-data-to-a-databa
 Bij het inleveren ook de de structuur van je database inleveren (mag ook als screenshot).
 Gebruik de interface vanuit plesk voor inzicht in de databasestructuur.
 Eisen:
-- Gegevens toevoegen
-- Gegevens verwijderen
-- Gegevens wijzigen (adv een lijst aanwezige data)
-- Sorteren
-- Selecties uitvoeren
+- Gegevens toevoegen TODO
+- Gegevens verwijderen DONE
+- Gegevens wijzigen (adv een lijst aanwezige data) DONE
+- Sorteren DONE
+- Selecties uitvoeren DONE
 -->
 <html lang="en">
 <head>
@@ -55,14 +55,23 @@ Eisen:
 
 <body>
     <div id="datatable_container">
-        <div id="table_error_box"></div>
-        <table id="datatable" class="o10table">
-        </table>
+        <div id="table_error_box">
+
+        </div>
+        <div id="table_add_entry_div">
+
+        </div>
+        <div id="table_div">
+            <table id="datatable" class="o10table">
+            </table>
+        </div>
     </div>
+
 
     <script>
         const server_url = "o10_db.php"
         const tableElem = document.getElementById('datatable');
+        const tableAddEntryDiv = document.getElementById('table_add_entry_div')
         const table = new CustomTable(
             tableElem,
             ["id", "Series_Title", "Released_Year", "Director"], {
@@ -99,6 +108,26 @@ Eisen:
                     }
                 );
             },
+            insertHandler: function (data_json) {
+                send_request(
+                    {
+                        INSERT: data_json,
+                        SEARCH: JSON.stringify(
+                            {
+                                data: table.searchContents,
+                                sort: table.sort
+                            })
+                    },
+                    server_url,
+                    function onSuccess(result) {
+                        table.tableData = result.data;
+                        table.populateBody();
+                    },
+                    function onError(xhr, status, err, msg) {
+                        console.error("Search failed:", xhr)
+                    }
+                )
+            },
             deleteHandler: function (data_json) {
                 send_request(
                     {
@@ -120,6 +149,7 @@ Eisen:
                 );
             }
         });
+        table.generateAddEntryForm(tableAddEntryDiv);
     </script>
 </body>
 </html>

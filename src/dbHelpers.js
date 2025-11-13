@@ -14,13 +14,13 @@ class CustomTable {
         this.element = tableElement;
         this.columns = columnNames;
         this.tableData = [];
+        this.entryForm = null;
 
-        // Determine generation flags based on handler presence
-        this.genSearchBars = typeof fetchData === "function";
-        this.genSortButtons = typeof fetchData === "function";
-        this.genUpdateButtons = typeof updateHandler === "function";
-        this.genAddEntryFields = typeof insertHandler === "function";
-        this.genDeleteButtons = typeof deleteHandler === "function";
+        this.genSearchBars = (typeof fetchData === "function");
+        this.genSortButtons = (typeof fetchData === "function");
+        this.genUpdateButtons = (typeof updateHandler === "function");
+        this.genAddEntryFields = (typeof insertHandler === "function");
+        this.genDeleteButtons = (typeof deleteHandler === "function");
 
         this.searchContents = {"id": ""};
         this.columns.forEach(column => (this.searchContents[column] = ""));
@@ -48,7 +48,12 @@ class CustomTable {
     }
 
 
-    populateHeader() {
+    populateHeader(
+        options = {
+            'searchBars': this.genSearchBars,
+            'sortButtons': this.genSortButtons,
+        }
+    ) {
         if (this.header == null)
             this.header = this.element.createTHead();
         const row = this.header.insertRow();
@@ -100,39 +105,22 @@ class CustomTable {
 
         this.rows = [];
         for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
-            const row = this.generateRow(data[rowIndex], rowIndex);
+            const row = this.generateRow(data[rowIndex], rowIndex, {
+                'updateButtons': this.genUpdateButtons,
+                'deleteButtons': this.genDeleteButtons
+            });
             this.rows.push(row);
             this.body.appendChild(row);
         }
         this.prevEditRow = null;
         this.prevDeleteButton = null;
-        /*
-        // TODO make this a separate form but linkable to the table
-        if (this.genAddEntryFields) {
-            const row = this.body.insertRow();
-            row.id = this.element.id+"_row_addEntry";
-            for (const col in this.columns) {
-                const cell = row.insertCell();
-                const field = document.createElement("input");
-                field.data_column = col
-                field.type = "text";
-                cell.appendChild(field);
-            }
-            const utilityCell = row.insertCell()
-            const addEntryButton = document.createElement("input");
-            addEntryButton.type = "button";
-            addEntryButton.value = "Add entry";
-            addEntryButton.classList.add("addEntryButton");
-            // Action data
-            addEntryButton.row_num =
-            this.addEntryHandler = this.addEntryHandler.bind(this);
-            addEntryButton.addEventListener("click", this.addEntryHandler);
-            utilityCell.appendChild(addEntryButton);
-        }
-        */
     }
     
-    generateRow(data, rowIndex, options = {}) {
+    generateRow(
+        data,
+        rowIndex,
+        options = {}
+    ) {
         const row = document.createElement("tr");
         row.dataset.rowIndex = rowIndex;
         row.dataset.id = data['id']
@@ -154,7 +142,7 @@ class CustomTable {
         }
 
         const utilityCell = row.insertCell();
-        if (this.genUpdateButtons) {
+        if (options['updateButtons']) {
             if ( !('id' in data)){
                 this.genDeleteButtons = false;
                 throw Error("Field 'id' not provided in data. Aborting edit button generation.");
@@ -169,6 +157,7 @@ class CustomTable {
             this._updateButtonHandler = this._updateButtonHandler.bind(this);
             updateButton.addEventListener("click", this._updateButtonHandler);
             utilityCell.appendChild(updateButton);
+            // Cancel and confirm buttons
             if (options['inputFields']) {
                 updateButton.value = "CONFIRM";
                 const cancelButton = document.createElement("input");
@@ -182,7 +171,7 @@ class CustomTable {
                 utilityCell.appendChild(cancelButton)
             }
         }
-        if (this.genDeleteButtons) {
+        if (options['deleteButtons']) {
             if ( !('id' in data)){
                 this.genDeleteButtons = false;
                 throw Error("Field 'id' not provided in data. Aborting delete button generation.");
@@ -199,6 +188,50 @@ class CustomTable {
             utilityCell.appendChild(deleteButton);
         }
         return row;
+    }
+
+    generateAddEntryForm(container_element) {
+        if (!this.genAddEntryFields) {
+            return;
+        }
+        if (this.entryForm) {
+            // Destruct old entry form if it already exists
+            this.entryForm.remove();
+            this.entryForm = null;
+        }
+        const form = document.createElement("form");
+        form.classList.add("add-entry-form");
+
+        for (const col of this.columns) {
+            if (col === 'id') continue;
+            const label = document.createElement("label");
+            label.textContent = col;
+            const inputField = document.createElement('input');
+            inputField.type = 'text';
+            inputField.name = col;
+            // TODO set input field to required if required
+            // inputField.required = True;
+            label.appendChild(inputField);
+            form.appendChild(label);
+        }
+        const submitButton = document.createElement("button");
+        submitButton.type = "submit";
+        submitButton.classList.add("addEntryButton");
+        submitButton.textContent = "Add Entry";
+        form.appendChild(submitButton);
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const data = {};
+            for (const col of this.columns) {
+                if (col === 'id') continue;
+                data[col] = form.elements[col].value;
+            }
+            this._insertHandler(data)
+            form.reset()
+        })
+
+        this.entryForm = form;
+        container_element.appendChild(this.entryForm);
     }
 
     /*
@@ -388,13 +421,20 @@ class CustomTable {
         try {
             switch(formatting) {
                 case 'edit':
-                    newRow = this.generateRow(data, rowIndex, {'inputFields': true});
+                    newRow = this.generateRow(data, rowIndex, {
+                        'inputFields': true,
+                        'updateButtons': this.genUpdateButtons,
+                        'deleteButtons': this.genDeleteButtons
+                    });
                     this.body.replaceChild(newRow, row);
                     this.rows[rowIndex] = newRow;
                     this.prevEditRow = newRow;
                     break;
                 default:
-                    newRow = this.generateRow(data, rowIndex);
+                    newRow = this.generateRow(data, rowIndex, {
+                        'updateButtons': this.genUpdateButtons,
+                        'deleteButtons': this.genDeleteButtons
+                    });
                     this.body.replaceChild(newRow, row);
                     this.rows[rowIndex] = newRow;
                     this.prevEditRow = newRow;

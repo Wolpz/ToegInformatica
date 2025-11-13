@@ -26,10 +26,12 @@ if (isset($_POST['DELETE'])) {
         return_error($e);
     }
 }
-if (isset($_POST['ADD'])) {
+if (isset($_POST['INSERT'])) {
     try {
         // TODO add insert handling
-        $imdb_top1000->insert();
+        $data = $_POST['INSERT'];
+
+        $imdb_top1000->insert($tablename, $data);
         $reply['error'] = false;
     }
     catch(Exception $e) {
