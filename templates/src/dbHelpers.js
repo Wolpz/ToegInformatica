@@ -342,13 +342,6 @@ class CustomTable {
         this.fetchData(this.searchContents, this.sort);
     }
 
-    _addEntryButtonHandler(event) {
-        // TODO make this a separate form
-        // TODO check required fields
-        // TODO write a generator for this form
-        console.log("add entry button unimplemented")
-    }
-
     _updateButtonHandler(event) {
         const button = event.currentTarget
         const rowIndex = button.dataset.rowIndex

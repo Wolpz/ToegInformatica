@@ -17,9 +17,9 @@ Eisen:
 <html lang="en">
 <head>
     <title>10</title>
-    <link rel="stylesheet" href="../../styles/styles.css">
+    <link rel="stylesheet" href="../styles/styles.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="../../src/dbHelpers.js"></script>
+    <script src="../src/dbHelpers.js"></script>
     <script>
         function send_request(request_json, server_url, onSuccess, onError) {
             console.log("Request sent:", request_json);

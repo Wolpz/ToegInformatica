@@ -77,7 +77,7 @@ function paintBucket(id, newColour) {
         recursiveFill(id, oldColour, newColour);
     }
 }
-// Queue-based filling algorithm in + pattern, works with table with no risk of stack overflow TODO
+// TODO Queue-based filling algorithm in + pattern, that works with table with no risk of stack overflow
 function queueFill(id, OldColour){
 
 }

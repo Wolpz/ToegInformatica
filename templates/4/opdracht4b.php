@@ -10,15 +10,14 @@ else
 </head>
 <body bgcolor="#FFFFFF">
 <?php
-if (!isset($tekst)) $tekst=$_POST['tekst'];
 if (strlen($tekst)>0){
     echo "<table border=3><tr>"."\n";
     $words = explode (" ",$tekst); //Split sentence into words
-
     for ($y=0;$y<count($words);$y++){
         $letters=str_split($words[$y]); //Split words into letters
         for ($x=0;$x<count($letters);$x++){
-            echo "<td style='background-color:".(0xAAAA*($x+1)*($y+1))."'>".$letters[$x]."</td>";
+            $colorVal = (0xAAAA*($x+1)*($y+1));
+            echo "<td style='background-color:".sprintf("#%06X", $colorVal & 0xFFFFFF)."'>".$letters[$x]."</td>";
         }
         echo "</tr><tr>";
     }

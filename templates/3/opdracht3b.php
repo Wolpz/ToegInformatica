@@ -1,8 +1,8 @@
 <?php
 if (array_key_exists('tekst',$_REQUEST)) {
     $tekst = $_REQUEST['tekst'];
-    $field = preg_replace('/[0-9]/', '', $tekst);
-    $button = preg_replace('/[^0-9]/', '', $tekst);
+    $field = preg_replace('/[^0-9]/', '', $tekst);
+    $button = preg_replace('/[0-9]/', '', $tekst);
 }
 else{
     $button="zend";

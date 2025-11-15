@@ -102,54 +102,54 @@ Voer een string in:<br>
     <input type="submit" value="Middle characters" name="midStr">
 </form>
 <?php
-    if(isset($_POST['addend'])){
-        $in->addend($in2);
-        $out = $in->getvar();
-    }
-    else if(isset($_POST['addfront'])){
-        $in->addfront($in2);
-        $out = $in->getvar();
-    }
-    else if(isset($_POST['clear'])){
-        $in->clear();
-        $out = $in->getvar();
-    }
-    else if(isset($_POST['replace'])){
-        $in->replace($in2, $in3);
-        $out = $in->getvar();
-    }
-    else if(isset($_POST['length'])){
-        $out = $in->length();
-    }
-    else if(isset($_POST['reverse'])){
-        $in->reverse();
-        $out = $in->getvar();
-    }
-    else if(isset($_POST['countChar'])){
-        $out = $in->countChar($in2);
-    }
-    else if(isset($_POST['strPos'])){
-        $out = $in->strPos($in2);
-    }
-    else if(isset($_POST['uppercase'])){
-        $in->upperCase();
-        $out = $in->getvar();
-    }
-    else if(isset($_POST['lowercase'])){
-        $in->lowerCase();
-        $out = $in->getvar();
-    }
-    else if(isset($_POST['conCat'])){
-        $in->conCat($in2);
-        $out = $in->getvar();
-    }
-    else if(isset($_POST['midStr'])){
-        if(is_numeric($in2))
-            $out = $in->midStr($in2);
-    }
-    else
-        $out = $in->getvar();
-    ?>
+if(isset($_POST['addend'])){
+    $in->addend($in2);
+    $out = $in->getvar();
+}
+else if(isset($_POST['addfront'])){
+    $in->addfront($in2);
+    $out = $in->getvar();
+}
+else if(isset($_POST['clear'])){
+    $in->clear();
+    $out = $in->getvar();
+}
+else if(isset($_POST['replace'])){
+    $in->replace($in2, $in3);
+    $out = $in->getvar();
+}
+else if(isset($_POST['length'])){
+    $out = $in->length();
+}
+else if(isset($_POST['reverse'])){
+    $in->reverse();
+    $out = $in->getvar();
+}
+else if(isset($_POST['countChar'])){
+    $out = $in->countChar($in2);
+}
+else if(isset($_POST['strPos'])){
+    $out = $in->strPos($in2);
+}
+else if(isset($_POST['uppercase'])){
+    $in->upperCase();
+    $out = $in->getvar();
+}
+else if(isset($_POST['lowercase'])){
+    $in->lowerCase();
+    $out = $in->getvar();
+}
+else if(isset($_POST['conCat'])){
+    $in->conCat($in2);
+    $out = $in->getvar();
+}
+else if(isset($_POST['midStr'])){
+    if(is_numeric($in2))
+        $out = $in->midStr($in2);
+}
+else
+    $out = $in->getvar();
+?>
 Output: <?php echo $out; ?><br>
 </body>
 </html>

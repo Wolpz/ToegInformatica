@@ -10,7 +10,7 @@ save option + button
 <head>
     <title>PixelPainter!</title>
     <!--  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>  -->
-    <script src="../../src/pp_painter.js">
+    <script src="../src/pp_painter.js">
         <?php
             // Setting height and width
             $height = 16;echo 'let height='.$height;
@@ -19,7 +19,7 @@ save option + button
             $defaultMode = "pixel";echo 'let mode ='.$defaultMode;
         ?>
     </script>
-    <link rel="stylesheet" href="../../styles/painter_styles.css">
+    <link rel="stylesheet" href="../styles/painter_styles.css">
 </head>
 
 <body>

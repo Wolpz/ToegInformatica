@@ -8,14 +8,18 @@
 
 json payload map:
 */
-require_once __DIR__.'/../../src/customDatabase.php';
+require_once __DIR__ . '/../src/customDatabase.php';
 
-$db_loc = __DIR__.'/../../databases/toeg_inf_db.db';
+$db_loc_sqlite = __DIR__.'/../databases/toeg_inf_db.db';
+$db_loc_mariaDB = "localhost:3306";
+
 $dbname = 'toeg_inf_db';
 $tablename = "imdb_top1000";
+$reply = [];
 
-//$imdb_top1000 = new CustomDatabase('sqlite:'.$db_loc, $dbname, '', '');
-$imdb_top1000 = new CustomDatabase("localhost:3306" , $dbname, '', '');
+//$imdb_top1000 = new CustomDatabase('sqlite:'.$db_loc_sqlite, $dbname, '', '');
+$imdb_top1000 = new CustomDatabase("mysql:host=localhost:3306", $dbname, 'lau', 'Lm4q8z42*');
+
 if (isset($_POST['DELETE'])) {
     try {
         $data = $_POST['DELETE'];
@@ -54,7 +58,7 @@ if (isset($_POST['SEARCH'])) {
         $data = $request['data'];
         foreach($data as $key => $item) {
             if ($data[$key] != "")
-            $data[$key] = ['LIKE' => "%".$item."%"];
+                $data[$key] = ['LIKE' => "%".$item."%"];
         }
         $sort = $request['sort'];
         $reply['debug'] = $data;

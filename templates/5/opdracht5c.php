@@ -9,18 +9,18 @@
 
 <div class="flex-container-row">Het is vandaag:</div>
 <div class="flex-container-row">
-<?php
-echo toGif(date('d'));
-echo monthToText(date('m'));
-echo toGif(date('Y'));
-?>
+    <?php
+    echo toGif(date('d'));
+    echo monthToText(date('m'));
+    echo toGif(date('Y'));
+    ?>
 </div>
 <div class="flex-container-row">
-<?php
-echo 'De tijd is ';
-echo toGif(date('H')).':';
-echo toGif(date('i'));
-?>
+    <?php
+    echo 'De tijd is ';
+    echo toGif(date('H')).':';
+    echo toGif(date('i'));
+    ?>
 </div>
 
 </body>
@@ -30,9 +30,11 @@ echo toGif(date('i'));
 function toGif($c){
     settype($c,"integer");
     settype($c,"string");
-
+    if (strlen($c) < 2) {
+        $c = '0'.$c;
+    }
     for ($x=0;$x<strlen($c);$x++)
-    echo '<img src="/images/p'.$c[$x].'.gif">';
+        echo '<img src="../images/p'.$c[$x].'.gif">';
 }
 
 function monthToText($month){

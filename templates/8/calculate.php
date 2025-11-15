@@ -47,7 +47,7 @@ switch($mode){
         $output .= " is ".factorial($in1);
         break;
     case 'world domination':
-        $output = '<audio controls autoplay><source src="../../DATA/lego-yoda-death-sound-effect.mp3" type="audio/mpeg"></audio>';
+        $output = '<audio controls autoplay><source src="../DATA/lego-yoda-death-sound-effect.mp3" type="audio/mpeg"></audio>';
         break;
     default:
         $output = "Please select a mode. You really shouldn't be seeing this.";
@@ -56,4 +56,15 @@ switch($mode){
     $json = array();
     $json['output'] = $output;
     echo json_encode($json);
+
+function factorial($n){
+    if ($n < 0) return "undefined";
+    if ($n === 0) return 1;
+    $result = 1;
+    for($i = 1; $i <= $n; $i++){
+        $result *= $i;
+    }
+    return $result;
+}
+
 

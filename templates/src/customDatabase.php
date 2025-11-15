@@ -1,5 +1,5 @@
 <?php
-// TODO document this with doxygen
+// TODO document this
 require "php_helpers.php";
 
 class CustomDatabase
@@ -13,9 +13,20 @@ class CustomDatabase
         $this->db_host = $host;
         $this->db_name = $db_name;
         try{
-            $this->pdo_conn = new PDO($host, $username, $password);
-            $this->pdo_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $options = [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            ];
+            $this->pdo_conn = new PDO(
+                $host,
+                $username,
+                $password,
+                $options
+            );
             $this->driver = $this->pdo_conn->getAttribute(PDO::ATTR_DRIVER_NAME);
+            if ($db_name && $this->driver === 'mysql') {
+                $this->pdo_conn->exec("USE `$db_name`;");
+            }
         }
         catch(PDOException $e){
             $this->pdo_conn = null;
@@ -30,7 +41,6 @@ class CustomDatabase
 
     function getColumnMeta($tableName){
         $columns = [];
-        // TODO add MariaDB driver
         switch($this->driver){
             case "sqlite":
                 $s = $this->pdo_conn->query("PRAGMA table_info('$tableName')");
@@ -43,8 +53,30 @@ class CustomDatabase
                     ];
                 }
                 break;
+            case "mysql":
+                $sql = "SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_KEY
+						FROM INFORMATION_SCHEMA.COLUMNS
+						WHERE TABLE_SCHEMA = :dbName
+						AND TABLE_NAME = :tableName";
+
+                $stmt = $this->pdo_conn->prepare($sql);
+                $stmt->bindValue(':dbName', $this->db_name);
+                $stmt->bindValue(':tableName', $tableName);
+                $stmt->execute();
+                $cols = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($cols as $col) {
+                    $columns[$col['COLUMN_NAME']] = [
+                        'type' => $col['COLUMN_TYPE'],
+                        'isRequired' => ($col['IS_NULLABLE'] === 'NO'),
+                        'isPrimaryKey' => ($col['COLUMN_KEY'] === 'PRI')
+                    ];
+                }
+                break;
+
+
             default:
-                echo "Unsupported database driver: $this->driver";
+                echo "Can't get column meta for unsupported database driver: $this->driver";
         }
         return $columns;
     }
@@ -108,7 +140,7 @@ class CustomDatabase
         $columnNames = array_keys($columns);
         if(!empty($sort)) {
             if (!in_array($sort['column'], $columnNames)) {
-                throw new Exception("Invalid sort field: " . $sort['column']);
+                throw new Exception("Invalid sort field: " . $sort['column'] . ". Valid fields: " . implode(", ", $columnNames));
             }
             if ($sort['direction'] !== 'ASC' && $sort['direction'] !== 'DESC') {
                 throw new Exception("Invalid sort direction: " . $sort['direction']);

@@ -1,6 +1,6 @@
 <?php
 
-$DATADIR = "../../DATA/";
+$DATADIR = __DIR__."/../DATA/";
 
 if (isset($_POST['graphType']))
     $type = $_POST["graphType"];
@@ -11,8 +11,8 @@ if (isset($_POST['fileSelect']))
 else
     $fileName = null;
 
-if(!file_exists($fileName) or $fileName == null)
-    $data = "Failed";
+if(!file_exists($fileName) or $fileName === null)
+    $data = "Failed to find ".realpath($fileName);
 else{
     $data = file($fileName);
 }

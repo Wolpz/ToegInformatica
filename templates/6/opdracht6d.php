@@ -8,10 +8,10 @@ if (isset($_REQUEST['adres0']))
 else
     $adres0="";
 
-$pos = FindInFile($naam0, "../../DATA/namen.txt");
+$pos = FindInFile($naam0, "../DATA/namen.txt");
 if($pos != -1){
     $naamMsg = $naam0.' is gevonden.';
-    $adresMsg = 'Adres: '.getLineFromFile($pos, "../../DATA/adressen.txt");
+    $adresMsg = 'Adres: '.getLineFromFile($pos, "../DATA/adressen.txt");
 }
 else{
     $naamMsg = $naam0.' is niet gevonden.';
@@ -25,6 +25,13 @@ else{
     <title>Bestanden</title>
 </head>
 <body>
+<div>
+    Valid names:<br>
+    henk<br>
+    jan<br>
+    piet<br>
+    klaas<br>
+</div>
 <form method=post>
     <input type=submit value=zend><br>
     <?php
@@ -43,7 +50,9 @@ else{
         $findString = strtolower($findString);
         $position = 0;
 
-        $fd=fopen($filepath,"r");
+        $fd = @fopen($filepath, "r");
+        if (!$fd) return -1; // file not found or cannot be opened
+
         while(!feof($fd)){
             $buffer=strtolower(trim(fgets($fd,4096)));
             if ($buffer == $findString){       //preg_match('/'.$findString.'/', $buffer)){
@@ -60,7 +69,7 @@ else{
 function getLineFromFile($linenum, $filepath){
     $buffer = '';
     $fd = fopen($filepath,"r");
-    for($i = 0; ($i <= $linenum || feof($fd)); $i++){
+    for($i = 0; ($i <= $linenum && !feof($fd)); $i++){
         $buffer=strtolower(fgets($fd,4096));
     }
     fclose($fd);
