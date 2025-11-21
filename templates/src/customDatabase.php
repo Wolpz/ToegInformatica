@@ -3,6 +3,7 @@
 require "php_helpers.php";
 
 class CustomDatabase
+// TODO add pagination through SQL OFFSET statements or cursor-like with WHERE id > last_seen_id
 {
     private $db_host;
     private $db_name;
